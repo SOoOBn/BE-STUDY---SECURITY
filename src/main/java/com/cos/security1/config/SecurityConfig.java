@@ -1,9 +1,9 @@
 package com.cos.security1.config;
 
+import com.cos.security1.config.oauth.PrincipalOauth2UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -15,10 +15,13 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfig {
 
-    @Bean
+    @Autowired
+    private PrincipalOauth2UserService principalOauth2UserService;
+
+    /*@Bean
     public BCryptPasswordEncoder encodePwd() {
         return new BCryptPasswordEncoder();
-    }
+    }*/
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -34,6 +37,11 @@ public class SecurityConfig {
                         .loginPage("/loginForm")
                         .loginProcessingUrl("/login")
                         .defaultSuccessUrl("/")
+                )
+                .oauth2Login(oauth -> oauth
+                        .loginPage("/loginForm")
+                        .userInfoEndpoint(userInfo -> userInfo
+                        .userService(principalOauth2UserService))
                 );
 
         return http.build(); // SecurityFilterChain 반환
